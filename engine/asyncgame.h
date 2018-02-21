@@ -25,4 +25,5 @@ private:
   AsyncPlayer::EndStatus m_end_status;
 
   void do_move(ChessBoard &board);
+  void init_colors();
 };

@@ -13,7 +13,7 @@ class AsyncClientPlayer : public std::enable_shared_from_this<AsyncClientPlayer>
                           public AsyncPlayer
 {
 public:
-  AsyncClientPlayer(std::shared_ptr<io_service> io_ptr);
+  AsyncClientPlayer(std::unique_ptr<ip::tcp::socket> socket);
 
   virtual void asyncPrepare(const ChessBoard &board, ReadyHandler handler) override;
   virtual void asyncGetNext(const ChessBoard &board, MoveReadyHandler handler) override;
@@ -22,10 +22,10 @@ public:
 
   virtual void cancel() override;
 
-  ip::tcp::socket &socket();
+  ip::tcp::socket & socket();
 
 private:
-  ip::tcp::socket m_socket;
+  std::unique_ptr<ip::tcp::socket> m_sock_ptr;
 };
 
 typedef std::shared_ptr<AsyncClientPlayer> player_ptr;

@@ -38,15 +38,6 @@ int main(int argc, char **argv)
 
     ip::tcp::endpoint ep(ip::address::from_string(ip), port);
     server_player->socket().connect(ep);
-    char color[1];
-    server_player->socket().read_some(buffer(color));
-    int server_color = color[0];
-    int ai_color = TOGGLE_COLOR(server_color);
-    server_player->setColor(server_color);
-    ai_player->setColor(ai_color);
-
-    std::cout << "Ai color is: " << COLOR_STR(ai_color) << 
-    " and server is " << COLOR_STR(server_color) << std::endl;
 
     AsyncGame game(io_ptr, ai_player, server_player);
     game.start([io_ptr](AsyncPlayer::EndStatus end_status) {
@@ -66,8 +57,6 @@ int main(int argc, char **argv)
     });
 
     io_ptr->run();
-
-    std::cin.get();
 
     return 0;
 }

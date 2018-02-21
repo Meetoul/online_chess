@@ -1,5 +1,6 @@
-#include "asyncgame.h"
+#include <ctime>
 
+#include "asyncgame.h"
 #include "chessboard.h"
 
 AsyncGame::AsyncGame(const std::shared_ptr<io_service> &io_ptr,
@@ -12,10 +13,26 @@ AsyncGame::AsyncGame(const std::shared_ptr<io_service> &io_ptr,
 {
 }
 
+void AsyncGame::init_colors()
+{
+  srand(time(0));
+  if (rand() % 2)
+  {
+    m_player1->setColor(WHITE);
+    m_player2->setColor(BLACK);
+  }
+  else
+  {
+    m_player1->setColor(BLACK);
+    m_player2->setColor(WHITE);
+  }
+}
+
 void AsyncGame::start(std::function<void(AsyncPlayer::EndStatus end_status)> end_game_handler)
 {
   ChessBoard board;
   board.initDefaultSetup();
+  init_colors();
 
   std::shared_ptr<io_service::strand> strand_ptr = std::make_shared<io_service::strand>(*m_io_ptr);
 
@@ -24,6 +41,7 @@ void AsyncGame::start(std::function<void(AsyncPlayer::EndStatus end_status)> end
 
   m_player1->asyncPrepare(board, [] { /* PREPARED */ });
   m_player2->asyncPrepare(board, [] { /* PREPARED */ });
+  
   do_move(board);
   end_game_handler(m_end_status);
 }

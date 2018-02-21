@@ -25,10 +25,18 @@ int main(int argc, char **argv)
     }
 
     auto io_ptr = std::make_shared<io_service>();
+    signal_set signals(*io_ptr, SIGINT);
+    signals.async_wait([](const boost::system::error_code &err, int sig_number) {
+        std::cout << "Server stopped!";
+        exit(0);
+    });
 
     ChessServer server(io_ptr, port);
     server.start_accept();
-    std::cin.get();
+
+    std::cout << "Server running on port " << port << ".\nPress Ctrl+C to stop server.\n";
+
+    io_ptr->run();
 
     return 0;
 }

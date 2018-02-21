@@ -14,6 +14,8 @@ ip::tcp::socket &AsyncServerPlayer::socket()
 
 void AsyncServerPlayer::asyncPrepare(const ChessBoard &board, ReadyHandler handler)
 {
+    char color_buffer[1];
+    m_socket.read_some(buffer(color_buffer));
     handler();
 }
 
