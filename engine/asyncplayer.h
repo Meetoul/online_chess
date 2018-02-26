@@ -36,7 +36,7 @@ public:
 
   std::shared_ptr<boost::asio::io_service::strand> getStrand() const;
   void setStrand(const std::shared_ptr<boost::asio::io_service::strand> &value);
-
+  
 protected:
   int color;
   std::shared_ptr<boost::asio::io_service::strand> m_strand_ptr;

@@ -35,11 +35,10 @@ SET (SRC engine/chessboard.cpp
     engine/asyncplayer.cpp
     engine/asyncaiplayer.cpp
     engine/asyncgame.cpp
+
+    engine/asynconlineplayer.cpp
     
-    server/server.cpp
-    server/asyncclientplayer.cpp
-    
-    client/asyncserverplayer.cpp)
+    server/server.cpp)
 
 include_directories("engine")
 

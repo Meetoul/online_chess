@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "../engine/asyncgame.h"
-#include "asyncserverplayer.hpp"
+#include "../engine/asynconlineplayer.h"
 #include "../engine/asyncaiplayer.h"
 #include <boost/asio.hpp>
 #include <memory>
@@ -32,12 +32,20 @@ int main(int argc, char **argv)
     }
 
     auto io_ptr = std::make_shared<io_service>();
-
-    auto ai_player = std::make_shared<AsyncAiPlayer>(1);
-    auto server_player = std::make_shared<AsyncServerPlayer>(io_ptr);
+    auto socket_ptr = std::make_unique<ip::tcp::socket>(*io_ptr);
 
     ip::tcp::endpoint ep(ip::address::from_string(ip), port);
-    server_player->socket().connect(ep);
+    socket_ptr->connect(ep);
+
+    char color_buffer[1];
+    socket_ptr->read_some(buffer(color_buffer));
+    auto ai_player = std::make_shared<AsyncAiPlayer>(1);
+    auto server_player = std::make_shared<AsyncOnlinePlayer>(std::move(socket_ptr));
+    ai_player->setColor(color_buffer[0]);
+    server_player->setColor(TOGGLE_COLOR(color_buffer[0]));
+
+    std::cout << "Ai color is " << COLOR_STR(ai_player->getColor())
+              << " and server color is " << COLOR_STR(server_player->getColor()) << std::endl;
 
     AsyncGame game(io_ptr, ai_player, server_player);
     game.start([io_ptr](AsyncPlayer::EndStatus end_status) {

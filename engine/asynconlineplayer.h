@@ -3,19 +3,18 @@
 #include <memory>
 #include <boost/asio.hpp>
 
-#include "../engine/asyncplayer.h"
-#include "../engine/chessboard.h"
-#include "../engine/asyncaiplayer.h"
+#include "asyncplayer.h"
+#include "chessboard.h"
 
 using namespace boost::asio;
 
-class AsyncServerPlayer : public std::enable_shared_from_this<AsyncServerPlayer>,
+class AsyncOnlinePlayer : public std::enable_shared_from_this<AsyncOnlinePlayer>,
                           public AsyncPlayer
 {
   public:
-    AsyncServerPlayer(std::shared_ptr<io_service> io_ptr);
+    AsyncOnlinePlayer(std::unique_ptr<ip::tcp::socket> socket);
 
-    virtual void asyncPrepare(const ChessBoard &board, ReadyHandler handler) override;
+    virtual void asyncPrepare(const ChessBoard &board, ReadyHandler handler) ;
     virtual void asyncGetNext(const ChessBoard &board, MoveReadyHandler handler) override;
     virtual void asyncShowMove(const ChessBoard &board, const Move &move, ReadyHandler handler) override;
     virtual void asyncShowResult(const ChessBoard &board, EndStatus status, ReadyHandler handler) override;
@@ -24,8 +23,8 @@ class AsyncServerPlayer : public std::enable_shared_from_this<AsyncServerPlayer>
 
     ip::tcp::socket &socket();
 
-  private:
-    ip::tcp::socket m_socket;
+  protected:
+    std::unique_ptr<ip::tcp::socket> m_sock_ptr;
 };
 
-typedef std::shared_ptr<AsyncServerPlayer> player_ptr;
+typedef std::shared_ptr<AsyncOnlinePlayer> player_ptr;

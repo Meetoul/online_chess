@@ -1,5 +1,7 @@
-#include "server.hpp"
 #include <iostream>
+#include <ctime>
+
+#include "server.hpp"
 #include "../engine/asyncgame.h"
 
 namespace ph = std::placeholders;
@@ -12,12 +14,12 @@ ChessServer::ChessServer(std::shared_ptr<io_service> io_ptr, short port)
 void ChessServer::handle_accept(const boost::system::error_code &err)
 {
     std::cout << "new connection!\n";
-    m_players.emplace_back(new AsyncClientPlayer(std::move(m_sock_ptr)));
+    m_players.emplace_back(new AsyncOnlinePlayer(std::move(m_sock_ptr)));
     m_sock_ptr = std::make_unique<ip::tcp::socket>(*m_io_ptr);
     m_acceptor.async_accept(*m_sock_ptr, std::bind(&ChessServer::handle_accept, this, ph::_1));
     if (m_players.size() == 2)
     {
-        start_game();
+        pre_game();
         return;
     }
 }
@@ -26,6 +28,19 @@ void ChessServer::start_accept()
 {
     m_sock_ptr = std::make_unique<ip::tcp::socket>(*m_io_ptr);
     m_acceptor.async_accept(*m_sock_ptr, std::bind(&ChessServer::handle_accept, this, ph::_1));
+}
+
+void ChessServer::pre_game()
+{
+    srand(0);
+    int color = rand() % 2 ? WHITE : BLACK;
+    m_players[0]->setColor(color);
+    m_players[1]->setColor(TOGGLE_COLOR(color));
+    char first_color[1] = {color};
+    char second_color[1] = {TOGGLE_COLOR(color)};
+    m_players[0]->socket().write_some(buffer(first_color));
+    m_players[1]->socket().write_some(buffer(second_color));
+    start_game();
 }
 
 void ChessServer::start_game()

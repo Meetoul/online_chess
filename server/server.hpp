@@ -3,7 +3,7 @@
 #include <boost/asio.hpp>
 #include <vector>
 
-#include "asyncclientplayer.hpp"
+#include "../engine/asynconlineplayer.h"
 
 using namespace boost::asio;
 
@@ -24,4 +24,5 @@ private:
 
   void handle_accept(const boost::system::error_code &err);
   void start_game();
+  void pre_game();
 };
